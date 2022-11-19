@@ -28,6 +28,12 @@ mongoClient.connect(url, (err, db) => {
   } else {
     const VIVAPAIN_DB = db.db("VIVAPAIN_DB");
     const collection = VIVAPAIN_DB.collection("GymOwners");
+    const collectionB = VIVAPAIN_DB.collection("Breakfast");
+    const collectionD = VIVAPAIN_DB.collection("Dinner");
+    const collectionL = VIVAPAIN_DB.collection("Lunch");
+    const collectionS = VIVAPAIN_DB.collection("Snacks");
+
+
 
     //This is Gym Owners database
 
@@ -40,6 +46,7 @@ mongoClient.connect(url, (err, db) => {
         weight: req.body.weight,
         trainedHrs: req.body.trainedHrs,
         lostWeight: req.body.lostWeight,
+        gainedWeight: req.body.gainedWeight,
       };
 
       console.log("Received user data from client.");
@@ -59,39 +66,91 @@ mongoClient.connect(url, (err, db) => {
       });
     });
 
-    app.post("/upload", (req, res) => {
-      const query1 = {
-        email: req.body.email,
-        password: req.body.password,
+    app.post("/breakfast", (req, res) => {
+      const query = {
+        num: req.body.num,
       };
 
-      console.log("Received user data from client.");
+      console.log("Received breakfast data from client.");
 
-      collection.findOne(query1, (err, result) => {
-        if (result == null) {
-          console.log("Object not found for updating.");
-          res.sendStatus(404);
-          return;
+      collectionB.findOne(query, (err, result) => {
+        if (result != null) {
+          const objToSend = {
+            steps: result.steps,
+            calories: result.calories,
+          };
+          console.log("Data found.");
+          res.status(200).send(JSON.stringify(objToSend));
         } else {
-          console.log("Object found for updating.");
+          console.log("Data not found.");
+          res.status(404);
         }
       });
+    });
 
-      const updatedUser = {
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-        age: req.body.age,
-        weight: req.body.weight,
-        trainedHrs: req.body.trainedHrs,
-        lostWeight: req.body.lostWeight,
+    app.post("/snacks", (req, res) => {
+      const query = {
+        num: req.body.num,
       };
 
-      collection.deleteOne(query1);
+      console.log("Received snacks data from client.");
 
-      collection.insertOne(updatedUser, (err, result) => {
-        console.log("Updated.");
-        res.status(200).send();
+      collectionS.findOne(query, (err, result) => {
+        if (result != null) {
+          const objToSend = {
+            steps: result.steps,
+            calories: result.calories,
+          };
+          console.log("Data found.");
+          res.status(200).send(JSON.stringify(objToSend));
+        } else {
+          console.log("Data not found.");
+          res.status(404);
+        }
+      });
+    });
+
+    app.post("/dinner", (req, res) => {
+      const query = {
+        num: req.body.num,
+      };
+
+      console.log("Received dinner data from client.");
+
+      collectionD.findOne(query, (err, result) => {
+        if (result != null) {
+          const objToSend = {
+            steps: result.steps,
+            calories: result.calories,
+          };
+          console.log("Data found.");
+          res.status(200).send(JSON.stringify(objToSend));
+        } else {
+          console.log("Data not found.");
+          res.status(404);
+        }
+      });
+    });
+
+    app.post("/lunch", (req, res) => {
+      const query = {
+        num: req.body.num,
+      };
+
+      console.log("Received lunch data from client.");
+
+      collectionL.findOne(query, (err, result) => {
+        if (result != null) {
+          const objToSend = {
+            steps: result.steps,
+            calories: result.calories,
+          };
+          console.log("Data found.");
+          res.status(200).send(JSON.stringify(objToSend));
+        } else {
+          console.log("Data not found.");
+          res.status(404);
+        }
       });
     });
 
@@ -113,6 +172,7 @@ mongoClient.connect(url, (err, db) => {
             weight: result.weight,
             trainedHrs: result.trainedHrs,
             lostWeight: result.lostWeight,
+            gainedWeight: req.body.gainedWeight,
           };
           console.log("user found.");
           res.status(200).send(JSON.stringify(objToSend));
@@ -149,6 +209,7 @@ mongoClient.connect(url, (err, db) => {
         weight: req.body.weight,
         trainedHrs: req.body.trainedHrs,
         lostWeight: req.body.lostWeight,
+        gainedWeight: req.body.gainedWeight,
       };
 
       collection.deleteOne(query1);
@@ -172,6 +233,7 @@ mongoClient.connect(url, (err, db) => {
         weight: req.body.weight,
         trainedHrs: req.body.trainedHrs,
         lostWeight: req.body.lostWeight,
+        gainedWeight: req.body.gainedWeight,
       };
 
       console.log("Received user data from client.");
@@ -208,6 +270,7 @@ mongoClient.connect(url, (err, db) => {
             weight: result.weight,
             trainedHrs: result.trainedHrs,
             lostWeight: result.lostWeight,
+            gainedWeight: req.body.gainedWeight,
           };
           console.log("user found.");
           res.status(200).send(JSON.stringify(objToSend));
@@ -243,6 +306,7 @@ mongoClient.connect(url, (err, db) => {
         weight: req.body.weight,
         trainedHrs: req.body.trainedHrs,
         lostWeight: req.body.lostWeight,
+        gainedWeight: req.body.gainedWeight,
       };
 
       collection1.deleteOne(query1);
