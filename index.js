@@ -59,6 +59,42 @@ mongoClient.connect(url, (err, db) => {
       });
     });
 
+    app.post("/upload", (req, res) => {
+      const query1 = {
+        email: req.body.email,
+        password: req.body.password,
+      };
+
+      console.log("Received user data from client.");
+
+      collection.findOne(query1, (err, result) => {
+        if (result == null) {
+          console.log("Object not found for updating.");
+          res.sendStatus(404);
+          return;
+        } else {
+          console.log("Object found for updating.");
+        }
+      });
+
+      const updatedUser = {
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        age: req.body.age,
+        weight: req.body.weight,
+        trainedHrs: req.body.trainedHrs,
+        lostWeight: req.body.lostWeight,
+      };
+
+      collection.deleteOne(query1);
+
+      collection.insertOne(updatedUser, (err, result) => {
+        console.log("Updated.");
+        res.status(200).send();
+      });
+    });
+
     app.post("/login", (req, res) => {
       const query = {
         email: req.body.email,
