@@ -33,12 +33,12 @@ mongoClient.connect(url, (err, db) => {
     const collectionL = VIVAPAIN_DB.collection("Lunch");
     const collectionS = VIVAPAIN_DB.collection("Snacks");
     const collectionUsersHistory = VIVAPAIN_DB.collection("UsersHistory");
-    const collectionGymOnwersHistory = VIVAPAIN_DB.collection("GymOwnersHistory");
+    const collectionGymOnwersHistory =
+      VIVAPAIN_DB.collection("GymOwnerHistory");
 
-    const TempUser = {
+    const collectionGymD = VIVAPAIN_DB.collection("Gyms");
 
-    }
-
+    const TempUser = {};
 
     //This is Gym Owners database
 
@@ -52,9 +52,9 @@ mongoClient.connect(url, (err, db) => {
         trainedHrs: req.body.trainedHrs,
         lostWeight: req.body.lostWeight,
         gainedWeight: req.body.gainedWeight,
-        date:req.body.date,
-        Created_At:req.body.CreatedAt,
-        count : 0,
+        date: req.body.date,
+        Created_At: req.body.CreatedAt,
+        count: 0,
       };
 
       console.log("Received user data from client.");
@@ -73,6 +73,31 @@ mongoClient.connect(url, (err, db) => {
         }
       });
     });
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+    app.get("/GymData", (req, res) => {
+      collectionGymD.find((err, result) => {
+        if (result == null) {
+          console.log(result);
+          console.log("GOOD")
+          res.status(200).send();
+        } else {
+          console.log("unknown error");
+          res.status(400).send();
+        }
+      });
+    });
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////GET YOUR DIET///////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////
 
     app.post("/breakfast", (req, res) => {
       const query = {
@@ -162,6 +187,12 @@ mongoClient.connect(url, (err, db) => {
       });
     });
 
+    ///////////////////////////////////////////////////////////////////////////
+
+    ///////////////////////////////GET YOUR DIET///////////////////////////////
+
+    ///////////////////////////////////////////////////////////////////////////
+
     app.post("/login", (req, res) => {
       const query = {
         email: req.body.email,
@@ -197,6 +228,10 @@ mongoClient.connect(url, (err, db) => {
         password: req.body.password,
       };
 
+      const countStatic = {
+        count: 0,
+      };
+
       console.log("Received user data from client.");
 
       collection.findOne(query1, (err, result) => {
@@ -218,23 +253,34 @@ mongoClient.connect(url, (err, db) => {
         trainedHrs: req.body.trainedHrs,
         lostWeight: req.body.lostWeight,
         gainedWeight: req.body.gainedWeight,
-        date:req.body.date,
-        Created_At:req.body.CreatedAt,
+        date: req.body.date,
+        Created_At: req.body.CreatedAt,
       };
 
-      const count = 0
+      const query3 = {
+        GETCOUNT: "COUNT",
+      };
 
-      const updatedUserHistory = {
-        name: req.body.name,
+      collectionGymOnwersHistory.findOne(query3, (err, result) => {
+        if (result == null) {
+          console.log("couldn't get count.");
+        } else {
+          countStatic.count = result.count;
+          console.log("count=" + countStatic.count);
+        }
+      });
+
+      const query2 = {
         email: req.body.email,
-        password: req.body.password,
-        age: req.body.age,
-        weight: req.body.weight,
-        trainedHrs: req.body.trainedHrs,
-        lostWeight: req.body.lostWeight,
-        gainedWeight: req.body.gainedWeight,
-        date:req.body.date,
+        count: countStatic.count,
       };
+
+      const queryCount = {
+        count: 0,
+        GETCOUNT: "COUNT",
+      };
+
+      const name = "";
 
       collection.deleteOne(query1);
 
@@ -242,10 +288,43 @@ mongoClient.connect(url, (err, db) => {
         console.log("Updated.");
       });
 
-      collectionGymOnwersHistory.insertOne(updatedUserHistory, (err, result) => {
-        console.log("inserted history.");
-        res.status(200).send();
-      });
+      for (const i = 0; i < countStatic.count; i++) {
+        console.log("searching for previeuos history...");
+        collectionGymOnwersHistory.findOne(query2, (err, result) => {
+          console.log("Fetching database.");
+          if (result == null) {
+            console.log("User updated " + i - 1 + " times");
+            name = req.body.name + "_Update" + i;
+            const updatedUserHistory = {
+              name: name,
+              email: req.body.email,
+              password: req.body.password,
+              age: req.body.age,
+              weight: req.body.weight,
+              trainedHrs: req.body.trainedHrs,
+              lostWeight: req.body.lostWeight,
+              gainedWeight: req.body.gainedWeight,
+              date: req.body.date,
+              count: i,
+            };
+            collectionGymOnwersHistory.insertOne(
+              updatedUserHistory,
+              (err, result) => {
+                console.log("inserted history.");
+              }
+            );
+            collection.deleteOne(query3);
+
+            collection.insertOne(queryCount, (err, result) => {
+              console.log("Inserted Count.");
+            });
+            res.status(200).send();
+            return;
+          } else {
+            console.log("FAILED. UNKNOWN ERROR.");
+          }
+        });
+      }
     });
 
     //This is users database
@@ -262,9 +341,9 @@ mongoClient.connect(url, (err, db) => {
         trainedHrs: req.body.trainedHrs,
         lostWeight: req.body.lostWeight,
         gainedWeight: req.body.gainedWeight,
-        date:req.body.date,
-        Created_At:req.body.CreatedAt,
-        count : 0,
+        date: req.body.date,
+        Created_At: req.body.CreatedAt,
+        count: 0,
       };
 
       console.log("Received user data from client.");
@@ -338,7 +417,7 @@ mongoClient.connect(url, (err, db) => {
         trainedHrs: req.body.trainedHrs,
         lostWeight: req.body.lostWeight,
         gainedWeight: req.body.gainedWeight,
-        date:req.body.date,
+        date: req.body.date,
       };
 
       collection1.deleteOne(query1);
