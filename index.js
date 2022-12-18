@@ -79,12 +79,13 @@ mongoClient.connect(url, (err, db) => {
     /////////////////////////////GET GYMS DATA/////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
 
-    app.get("/GymData", (req, res) => {
-      collectionGymD.find((err, result) => {
-        if (result == null) {
-          console.log(result);
-          console.log("GOOD")
-          res.status(200).send();
+    app.post("/GymData", (req, res) => {
+      console.log("trying to get gym details...");
+      collectionGymD.find({}).toArray((err, result) => {
+        console.log("still trying...");
+        if (result != null) {
+          console.log("Gyms details retrieved successfully!");
+          res.status(200).send(JSON.stringify(result));
         } else {
           console.log("unknown error");
           res.status(400).send();
@@ -100,9 +101,11 @@ mongoClient.connect(url, (err, db) => {
     ///////////////////////////REQUEST TO ADD A GYM////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
 
-    app.post("/requestG",(req,res)=>{
+    app.post("/requestG", (req, res) => {
       const RequestedGym = {
         RequestedAt: req.body.RequestedAt,
+        UserName: req.body.UserName,
+        UserEmail: req.body.UserEmail,
         GymName: req.body.GymName,
         GymAddress: req.body.GymAddress,
         GymPhoneNumber: req.body.GymPhoneNumber,
@@ -125,13 +128,11 @@ mongoClient.connect(url, (err, db) => {
           res.status(400).send();
         }
       });
-    })
+    });
 
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////REQUEST TO ADD A GYM////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
-
-
 
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////GET YOUR DIET///////////////////////////////
