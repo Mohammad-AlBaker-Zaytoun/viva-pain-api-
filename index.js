@@ -79,13 +79,15 @@ mongoClient.connect(url, (err, db) => {
     /////////////////////////////GET GYMS DATA/////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
 
-    app.post("/GymData", (req, res) => {
+    app.get("/GymData", (req, res) => {
       console.log("trying to get gym details...");
       collectionGymD.find({}).toArray((err, result) => {
         console.log("still trying...");
         if (result != null) {
           console.log("Gyms details retrieved successfully!");
-          res.status(200).send(JSON.stringify(result));
+          console.log(result);
+          //console.log(JSON.stringify(result));
+          res.status(200).send(result);
         } else {
           console.log("unknown error");
           res.status(400).send();
