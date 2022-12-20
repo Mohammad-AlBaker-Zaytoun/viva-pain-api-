@@ -350,6 +350,8 @@ mongoClient.connect(url, (err, db) => {
     app.post("/GetGymOwnerHistory", (req, res) => {
       const queryF = { name: req.body.name };
 
+      console.log( req.body.name );
+
       collectionGymOnwersHistory
         .find(queryF)
         .sort({ _id: -1 })
@@ -359,8 +361,10 @@ mongoClient.connect(url, (err, db) => {
           if (result != null) {
             console.log("History retrieved successfully!");
             console.log(result);
+            res.status(200).send(result);
           } else {
             console.log("unknown error");
+            res.status(400).send();
           }
         });
     });
@@ -491,6 +495,8 @@ mongoClient.connect(url, (err, db) => {
     app.post("/GetUserHistory", (req, res) => {
       const queryF = { name: req.body.name };
 
+      console.log( req.body.name );
+
       collectionUsersHistory
         .find(queryF)
         .sort({ _id: -1 })
@@ -500,8 +506,10 @@ mongoClient.connect(url, (err, db) => {
           if (result != null) {
             console.log("History retrieved successfully!");
             console.log(result);
+            res.status(200).send(result);
           } else {
             console.log("unknown error");
+            res.status(400).send();
           }
         });
     });
