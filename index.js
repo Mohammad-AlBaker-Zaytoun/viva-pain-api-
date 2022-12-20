@@ -326,7 +326,6 @@ mongoClient.connect(url, (err, db) => {
         console.log("Updated.");
       });
 
-
       const historyInsertRecord = {
         name: req.body.name,
         email: req.body.email,
@@ -338,25 +337,32 @@ mongoClient.connect(url, (err, db) => {
         gainedWeight: req.body.gainedWeight,
         date: req.body.date,
         Created_At: req.body.CreatedAt,
-      }
+      };
 
-
-      collectionGymOnwersHistory.insertOne(historyInsertRecord, (err, result) => {
-        console.log("History recorded.");
-      });
-
-      const queryF = {name: req.body.name}
-
-      collectionGymOnwersHistory.find(queryF).sort({_id:-1}).limit(4).toArray((err, result) => {
-        console.log("still trying to retrieve history...");
-        if (result != null) {
-          console.log("History retrieved successfully!");
-          console.log(result);
-        } else {
-          console.log("unknown error");
+      collectionGymOnwersHistory.insertOne(
+        historyInsertRecord,
+        (err, result) => {
+          console.log("History recorded.");
         }
-      })
+      );
+    });
 
+    app.get("/GetGymOwnerHistory", (req, res) => {
+      const queryF = { name: req.body.name };
+
+      collectionGymOnwersHistory
+        .find(queryF)
+        .sort({ _id: -1 })
+        .limit(4)
+        .toArray((err, result) => {
+          console.log("still trying to retrieve history...");
+          if (result != null) {
+            console.log("History retrieved successfully!");
+            console.log(result);
+          } else {
+            console.log("unknown error");
+          }
+        });
     });
 
     /////////////////////////////////////////////////////////////////////////////
@@ -454,6 +460,7 @@ mongoClient.connect(url, (err, db) => {
         lostWeight: req.body.lostWeight,
         gainedWeight: req.body.gainedWeight,
         date: req.body.date,
+        Created_At: req.body.CreatedAt,
       };
 
       collection1.deleteOne(query1);
@@ -462,6 +469,41 @@ mongoClient.connect(url, (err, db) => {
         console.log("Updated.");
         res.status(200).send();
       });
+
+      const historyInsertRecord = {
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        age: req.body.age,
+        weight: req.body.weight,
+        trainedHrs: req.body.trainedHrs,
+        lostWeight: req.body.lostWeight,
+        gainedWeight: req.body.gainedWeight,
+        date: req.body.date,
+        Created_At: req.body.CreatedAt,
+      };
+
+      collectionUsersHistory.insertOne(historyInsertRecord, (err, result) => {
+        console.log("History recorded.");
+      });
+    });
+
+    app.get("/GetUserHistory", (req, res) => {
+      const queryF = { name: req.body.name };
+
+      collectionUsersHistory
+        .find(queryF)
+        .sort({ _id: -1 })
+        .limit(4)
+        .toArray((err, result) => {
+          console.log("still trying to retrieve history...");
+          if (result != null) {
+            console.log("History retrieved successfully!");
+            console.log(result);
+          } else {
+            console.log("unknown error");
+          }
+        });
     });
   }
 });
