@@ -86,7 +86,6 @@ mongoClient.connect(url, (err, db) => {
         if (result != null) {
           console.log("Gyms details retrieved successfully!");
           console.log(result);
-          //console.log(JSON.stringify(result));
           res.status(200).send(result);
         } else {
           console.log("unknown error");
