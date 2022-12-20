@@ -305,7 +305,7 @@ mongoClient.connect(url, (err, db) => {
           console.log("couldn't get count.");
         } else {
           countStatic.count = result.count;
-          console.log("count=" + countStatic.count);
+          console.log("count = " + countStatic.count);
         }
       });
 
@@ -327,46 +327,44 @@ mongoClient.connect(url, (err, db) => {
         console.log("Updated.");
       });
 
-      for (const i = 0; i < countStatic.count; i++) {
-        console.log("searching for previeuos history...");
-        collectionGymOnwersHistory.findOne(query2, (err, result) => {
-          console.log("Fetching database.");
-          if (result == null) {
-            console.log("User updated " + i - 1 + " times");
-            name = req.body.name + "_Update" + i;
-            const updatedUserHistory = {
-              name: name,
-              email: req.body.email,
-              password: req.body.password,
-              age: req.body.age,
-              weight: req.body.weight,
-              trainedHrs: req.body.trainedHrs,
-              lostWeight: req.body.lostWeight,
-              gainedWeight: req.body.gainedWeight,
-              date: req.body.date,
-              count: i,
-            };
-            collectionGymOnwersHistory.insertOne(
-              updatedUserHistory,
-              (err, result) => {
-                console.log("inserted history.");
-              }
-            );
-            collection.deleteOne(query3);
 
-            collection.insertOne(queryCount, (err, result) => {
-              console.log("Inserted Count.");
-            });
-            res.status(200).send();
-            return;
-          } else {
-            console.log("FAILED. UNKNOWN ERROR.");
-          }
-        });
+      const historyInsertRecord = {
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        age: req.body.age,
+        weight: req.body.weight,
+        trainedHrs: req.body.trainedHrs,
+        lostWeight: req.body.lostWeight,
+        gainedWeight: req.body.gainedWeight,
+        date: req.body.date,
+        Created_At: req.body.CreatedAt,
       }
+
+
+      collectionGymOnwersHistory.insertOne(historyInsertRecord, (err, result) => {
+        console.log("History recorded.");
+      });
+
+      const queryF = {name: req.body.name}
+
+      collectionGymOnwersHistory.find(queryF).sort({_id:-1}).limit(4).toArray((err, result) => {
+        console.log("still trying to retrieve history...");
+        if (result != null) {
+          console.log("History retrieved successfully!");
+          console.log(result);
+        } else {
+          console.log("unknown error");
+        }
+      })
+
     });
 
+    /////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
     //This is users database
+    /////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
 
     const collection1 = VIVAPAIN_DB.collection("Users");
 
