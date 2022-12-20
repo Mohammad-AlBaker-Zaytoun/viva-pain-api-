@@ -347,7 +347,7 @@ mongoClient.connect(url, (err, db) => {
       );
     });
 
-    app.get("/GetGymOwnerHistory", (req, res) => {
+    app.post("/GetGymOwnerHistory", (req, res) => {
       const queryF = { name: req.body.name };
 
       collectionGymOnwersHistory
@@ -488,7 +488,7 @@ mongoClient.connect(url, (err, db) => {
       });
     });
 
-    app.get("/GetUserHistory", (req, res) => {
+    app.post("/GetUserHistory", (req, res) => {
       const queryF = { name: req.body.name };
 
       collectionUsersHistory
