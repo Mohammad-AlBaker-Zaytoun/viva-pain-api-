@@ -249,7 +249,7 @@ mongoClient.connect(url, (err, db) => {
             weight: result.weight,
             trainedHrs: result.trainedHrs,
             lostWeight: result.lostWeight,
-            gainedWeight: req.body.gainedWeight,
+            gainedWeight: result.gainedWeight,
           };
           console.log("user found.");
           res.status(200).send(JSON.stringify(objToSend));
