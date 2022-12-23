@@ -418,6 +418,7 @@ mongoClient.connect(url, (err, db) => {
       console.log("Received user data from client.");
 
       collection1.findOne(query, (err, result) => {
+        console.log("user found.");
         if (result != null) {
           const objToSend = {
             name: result.name,
@@ -426,9 +427,9 @@ mongoClient.connect(url, (err, db) => {
             weight: result.weight,
             trainedHrs: result.trainedHrs,
             lostWeight: result.lostWeight,
-            gainedWeight: req.body.gainedWeight,
+            gainedWeight: result.gainedWeight,
+            password: req.body.password,
           };
-          console.log("user found.");
           res.status(200).send(JSON.stringify(objToSend));
         } else {
           console.log("user not found.");
