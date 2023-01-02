@@ -9,7 +9,6 @@ app.use((request, response, next) => {
   console.log(`${request.method}:${request.url}`);
   next();
 });
-const i = 0;
 mongoClient.connect(url, (err, db) => {
   if (err) {
     console.log("Connection Error.");
