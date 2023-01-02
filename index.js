@@ -1,5 +1,4 @@
 const express = require("express");
-const multer = require("multer");
 const app = express();
 const mongoClient = require("mongodb").MongoClient;
 const url = "mongodb://localhost:27017";
@@ -10,17 +9,6 @@ app.use((request, response, next) => {
   console.log(`${request.method}:${request.url}`);
   next();
 });
-
-const Storage = multer.diskStorage({
-  destination: "uploads",
-  filename: (req, file, cb) => {
-    cb(null, Date.now + file.originalname);
-  },
-});
-
-const upload = multer({
-  storage: Storage,
-}).single("UploadImage");
 
 mongoClient.connect(url, (err, db) => {
   if (err) {
@@ -39,8 +27,6 @@ mongoClient.connect(url, (err, db) => {
     const collectionGymD = VIVAPAIN_DB.collection("Gyms");
     const collectionRequestedGym = VIVAPAIN_DB.collection("GymRequests");
 
-    const TempUser = {};
-
     //This is Gym Owners database
 
     app.post("/signup", (req, res) => {
@@ -55,6 +41,7 @@ mongoClient.connect(url, (err, db) => {
         gainedWeight: req.body.gainedWeight,
         date: req.body.date,
         Created_At: req.body.CreatedAt,
+        lastUpdated: req.body.lastUpdated,
         count: 0,
       };
 
@@ -250,6 +237,7 @@ mongoClient.connect(url, (err, db) => {
             trainedHrs: result.trainedHrs,
             lostWeight: result.lostWeight,
             gainedWeight: result.gainedWeight,
+            lastUpdated: result.lastUpdated,
           };
           console.log("user found.");
           res.status(200).send(JSON.stringify(objToSend));
@@ -292,6 +280,7 @@ mongoClient.connect(url, (err, db) => {
         lostWeight: req.body.lostWeight,
         gainedWeight: req.body.gainedWeight,
         date: req.body.date,
+        lastUpdated: req.body.lastUpdated,
         Created_At: req.body.CreatedAt,
       };
 
@@ -307,18 +296,6 @@ mongoClient.connect(url, (err, db) => {
           console.log("count = " + countStatic.count);
         }
       });
-
-      const query2 = {
-        email: req.body.email,
-        count: countStatic.count,
-      };
-
-      const queryCount = {
-        count: 0,
-        GETCOUNT: "COUNT",
-      };
-
-      const name = "";
 
       collection.deleteOne(query1);
 
@@ -389,6 +366,7 @@ mongoClient.connect(url, (err, db) => {
         gainedWeight: req.body.gainedWeight,
         date: req.body.date,
         Created_At: req.body.CreatedAt,
+        lastUpdated: req.body.lastUpdated,
         count: 0,
       };
 
@@ -429,6 +407,7 @@ mongoClient.connect(url, (err, db) => {
             lostWeight: result.lostWeight,
             gainedWeight: result.gainedWeight,
             password: req.body.password,
+            lastUpdated: result.lastUpdated,
           };
           res.status(200).send(JSON.stringify(objToSend));
         } else {
@@ -465,6 +444,7 @@ mongoClient.connect(url, (err, db) => {
         lostWeight: req.body.lostWeight,
         gainedWeight: req.body.gainedWeight,
         date: req.body.date,
+        lastUpdated: req.body.lastUpdated,
         Created_At: req.body.CreatedAt,
       };
 
