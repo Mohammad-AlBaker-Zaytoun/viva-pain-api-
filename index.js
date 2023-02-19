@@ -1,34 +1,40 @@
-const express = require("express");
-const app = express();
-const mongoClient = require("mongodb").MongoClient;
-const url = "mongodb://localhost:27017";
+const express = require("express");  // Import express library
+const app = express(); // Create instance of express
+const mongoClient = require("mongodb").MongoClient; // Import mongodb library
+const url = "mongodb://localhost:27017";  // String that holds default mongodb URL
 
-app.use(express.json());
+app.use(express.json());  // Configure middleware to parse incoming requests with JSON payloads
 
 app.use((request, response, next) => {
-  console.log(`${request.method}:${request.url}`);
+  console.log(`${request.method}:${request.url}`);  // Middleware function that logs information about incoming requests to the console
   next();
 });
-mongoClient.connect(url, (err, db) => {
+mongoClient.connect(url, (err, db) => {  // Establishes a connection to the MongoDB server
   if (err) {
     console.log("Connection Error.");
   } else {
-    const VIVAPAIN_DB = db.db("VIVAPAIN_DB");
-    const collection = VIVAPAIN_DB.collection("GymOwners");
-    const collectionB = VIVAPAIN_DB.collection("Breakfast");
-    const collectionD = VIVAPAIN_DB.collection("Dinner");
-    const collectionL = VIVAPAIN_DB.collection("Lunch");
-    const collectionS = VIVAPAIN_DB.collection("Snacks");
-    const collectionUsersHistory = VIVAPAIN_DB.collection("UsersHistory");
-    const collectionGymOnwersHistory =
-      VIVAPAIN_DB.collection("GymOwnerHistory");
+    const VIVAPAIN_DB = db.db("VIVAPAIN_DB");                                           // Database name  |
+    const collection = VIVAPAIN_DB.collection("GymOwners");                             // Table 1        |
+    const collectionB = VIVAPAIN_DB.collection("Breakfast");                            // Table 2        |
+    const collectionD = VIVAPAIN_DB.collection("Dinner");                               // Table 3        |
+    const collectionL = VIVAPAIN_DB.collection("Lunch");                                // Table 4        |
+    const collectionS = VIVAPAIN_DB.collection("Snacks");                               // Table 5        |---> init database with tables    
+    const collectionUsersHistory = VIVAPAIN_DB.collection("UsersHistory");              // Table 6        |
+    const collectionGymOnwersHistory = VIVAPAIN_DB.collection("GymOwnerHistory");       // Table 7        |
+    const collectionGymD = VIVAPAIN_DB.collection("Gyms");                              // Table 8        |
+    const collectionRequestedGym = VIVAPAIN_DB.collection("GymRequests");               // Table 9        |
+    const collection1 = VIVAPAIN_DB.collection("Users");                                // Table 10       |
 
-    const collectionGymD = VIVAPAIN_DB.collection("Gyms");
-    const collectionRequestedGym = VIVAPAIN_DB.collection("GymRequests");
+    
+    
+    /////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    //This is gym owner database
+    /////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
 
-    //This is Gym Owners database
 
-    app.post("/signup", (req, res) => {
+    app.post("/signup", (req, res) => {                         // Route 1 : signup
       const newUser = {
         name: req.body.name,
         email: req.body.email,
@@ -61,163 +67,7 @@ mongoClient.connect(url, (err, db) => {
       });
     });
 
-    ///////////////////////////////////////////////////////////////////////////
-    /////////////////////////////GET GYMS DATA/////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////
-
-    app.get("/GymData", (req, res) => {
-      console.log("trying to get gym details...");
-      collectionGymD.find({}).toArray((err, result) => {
-        console.log("still trying...");
-        if (result != null) {
-          console.log("Gyms details retrieved successfully!");
-          console.log(result);
-          res.status(200).send(result);
-        } else {
-          console.log("unknown error");
-          res.status(400).send();
-        }
-      });
-    });
-
-    ///////////////////////////////////////////////////////////////////////////
-    /////////////////////////////GET GYMS DATA/////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////
-
-    ///////////////////////////////////////////////////////////////////////////
-    ///////////////////////////REQUEST TO ADD A GYM////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////
-
-    app.post("/requestG", (req, res) => {
-      const RequestedGym = {
-        RequestedAt: req.body.RequestedAt,
-        UserName: req.body.UserName,
-        UserEmail: req.body.UserEmail,
-        GymName: req.body.GymName,
-        GymAddress: req.body.GymAddress,
-        GymPhoneNumber: req.body.GymPhoneNumber,
-        GymAllowedGender: req.body.GymAllowedGender,
-        GymMonthlyPlan: req.body.GymMonthlyPlan,
-      };
-
-      console.log("Received requested gym data from client.");
-
-      const query = { GymName: RequestedGym.GymName };
-
-      collectionRequestedGym.findOne(query, (err, result) => {
-        if (result == null) {
-          console.log("Request Sent.");
-          collectionRequestedGym.insertOne(RequestedGym, (err, result) => {
-            res.status(200).send();
-          });
-        } else {
-          console.log("Gym is already requested!");
-          res.status(400).send();
-        }
-      });
-    });
-
-    ///////////////////////////////////////////////////////////////////////////
-    ///////////////////////////REQUEST TO ADD A GYM////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////
-
-    ///////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////GET YOUR DIET///////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////
-
-    app.post("/breakfast", (req, res) => {
-      const query = {
-        num: req.body.num,
-      };
-
-      console.log("Received breakfast data from client.");
-
-      collectionB.findOne(query, (err, result) => {
-        if (result != null) {
-          const objToSend = {
-            steps: result.steps,
-            calories: result.calories,
-          };
-          console.log("Data found.");
-          res.status(200).send(JSON.stringify(objToSend));
-        } else {
-          console.log("Data not found.");
-          res.status(404);
-        }
-      });
-    });
-
-    app.post("/snacks", (req, res) => {
-      const query = {
-        num: req.body.num,
-      };
-
-      console.log("Received snacks data from client.");
-
-      collectionS.findOne(query, (err, result) => {
-        if (result != null) {
-          const objToSend = {
-            steps: result.steps,
-            calories: result.calories,
-          };
-          console.log("Data found.");
-          res.status(200).send(JSON.stringify(objToSend));
-        } else {
-          console.log("Data not found.");
-          res.status(404);
-        }
-      });
-    });
-
-    app.post("/dinner", (req, res) => {
-      const query = {
-        num: req.body.num,
-      };
-
-      console.log("Received dinner data from client.");
-
-      collectionD.findOne(query, (err, result) => {
-        if (result != null) {
-          const objToSend = {
-            steps: result.steps,
-            calories: result.calories,
-          };
-          console.log("Data found.");
-          res.status(200).send(JSON.stringify(objToSend));
-        } else {
-          console.log("Data not found.");
-          res.status(404);
-        }
-      });
-    });
-
-    app.post("/lunch", (req, res) => {
-      const query = {
-        num: req.body.num,
-      };
-
-      console.log("Received lunch data from client.");
-
-      collectionL.findOne(query, (err, result) => {
-        if (result != null) {
-          const objToSend = {
-            steps: result.steps,
-            calories: result.calories,
-          };
-          console.log("Data found.");
-          res.status(200).send(JSON.stringify(objToSend));
-        } else {
-          console.log("Data not found.");
-          res.status(404);
-        }
-      });
-    });
-
-    ///////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////GET YOUR DIET///////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////
-
-    app.post("/login", (req, res) => {
+    app.post("/login", (req, res) => {                      // Route 2 : login
       const query = {
         email: req.body.email,
         password: req.body.password,
@@ -247,7 +97,7 @@ mongoClient.connect(url, (err, db) => {
       });
     });
 
-    app.post("/update", (req, res) => {
+    app.post("/update", (req, res) => {                             // Route 3 : update , requested after we change profile data
       const query1 = {
         email: req.body.email,
         password: req.body.password,
@@ -323,10 +173,10 @@ mongoClient.connect(url, (err, db) => {
       );
     });
 
-    app.post("/GetGymOwnerHistory", (req, res) => {
+    app.post("/GetGymOwnerHistory", (req, res) => {              // Route 4 : GetGymOwnerHistory , returns last 4 updates of a gym owner
       const queryF = { name: req.body.name };
 
-      console.log( req.body.name );
+      console.log(req.body.name);
 
       collectionGymOnwersHistory
         .find(queryF)
@@ -347,13 +197,210 @@ mongoClient.connect(url, (err, db) => {
 
     /////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////
+    //This is gym owner database
+    /////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    /////////////////////////////GET GYMS DATA/////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+    app.get("/GymData", (req, res) => {                             // Route 5 : GymData , Retrieve promoted gyms
+      console.log("trying to get gym details...");
+      collectionGymD.find({}).toArray((err, result) => {
+        console.log("still trying...");
+        if (result != null) {
+          console.log("Gyms details retrieved successfully!");
+          console.log(result);
+          res.status(200).send(result);
+        } else {
+          console.log("unknown error");
+          res.status(400).send();
+        }
+      });
+    });
+
+    ///////////////////////////////////////////////////////////////////////////
+    /////////////////////////////GET GYMS DATA/////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////REQUEST TO ADD A GYM////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+    app.post("/requestG", (req, res) => {                      // Route 6 : requestG , Requested gym data to upload
+      const RequestedGym = {
+        RequestedAt: req.body.RequestedAt,
+        UserName: req.body.UserName,
+        UserEmail: req.body.UserEmail,
+        GymName: req.body.GymName,
+        GymAddress: req.body.GymAddress,
+        GymPhoneNumber: req.body.GymPhoneNumber,
+        GymAllowedGender: req.body.GymAllowedGender,
+        GymMonthlyPlan: req.body.GymMonthlyPlan,
+      };
+
+      console.log("Received requested gym data from client.");
+
+      const query = { GymName: RequestedGym.GymName };
+
+      collectionRequestedGym.findOne(query, (err, result) => {
+        if (result == null) {
+          console.log("Request Sent.");
+          collectionRequestedGym.insertOne(RequestedGym, (err, result) => {
+            res.status(200).send();
+          });
+        } else {
+          console.log("Gym is already requested!");
+          res.status(400).send();
+        }
+      });
+    });
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////REQUEST TO ADD A GYM////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////GET YOUR DIET///////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+    app.post("/breakfast", (req, res) => {                        // Route 7 : breakfast , get breakfast list
+      const query = {
+        num: req.body.num,
+      };
+
+      console.log("Received breakfast data from client.");
+
+      collectionB.findOne(query, (err, result) => {
+        if (result != null) {
+          const objToSend = {
+            steps: result.steps,
+            calories: result.calories,
+          };
+          console.log("Data found.");
+          res.status(200).send(JSON.stringify(objToSend));
+        } else {
+          console.log("Data not found.");
+          res.status(404);
+        }
+      });
+    });
+
+    app.post("/snacks", (req, res) => {                         // Route 8 : snacks , get snacks list 
+      const query = {
+        num: req.body.num,
+      };
+
+      console.log("Received snacks data from client.");
+
+      collectionS.findOne(query, (err, result) => {
+        if (result != null) {
+          const objToSend = {
+            steps: result.steps,
+            calories: result.calories,
+          };
+          console.log("Data found.");
+          res.status(200).send(JSON.stringify(objToSend));
+        } else {
+          console.log("Data not found.");
+          res.status(404);
+        }
+      });
+    });
+
+    app.post("/dinner", (req, res) => {                      // Route 9 : dinner , get dinner list
+      const query = {
+        num: req.body.num,
+      };
+
+      console.log("Received dinner data from client.");
+
+      collectionD.findOne(query, (err, result) => {
+        if (result != null) {
+          const objToSend = {
+            steps: result.steps,
+            calories: result.calories,
+          };
+          console.log("Data found.");
+          res.status(200).send(JSON.stringify(objToSend));
+        } else {
+          console.log("Data not found.");
+          res.status(404);
+        }
+      });
+    });
+
+    app.post("/lunch", (req, res) => {                  // Route 10 : lunch , get lunch list
+      const query = {
+        num: req.body.num,
+      };
+
+      console.log("Received lunch data from client.");
+
+      collectionL.findOne(query, (err, result) => {
+        if (result != null) {
+          const objToSend = {
+            steps: result.steps,
+            calories: result.calories,
+          };
+          console.log("Data found.");
+          res.status(200).send(JSON.stringify(objToSend));
+        } else {
+          console.log("Data not found.");
+          res.status(404);
+        }
+      });
+    });
+
+    ///////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////GET YOUR DIET///////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+    
+
+    
+
+    /////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
     //This is users database
     /////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////
 
-    const collection1 = VIVAPAIN_DB.collection("Users");
 
-    app.post("/signup1", (req, res) => {
+    app.post("/signup1", (req, res) => {                             // Route 11 : signup 
       const newUser = {
         name: req.body.name,
         email: req.body.email,
@@ -386,7 +433,7 @@ mongoClient.connect(url, (err, db) => {
       });
     });
 
-    app.post("/login1", (req, res) => {
+    app.post("/login1", (req, res) => {                     // Route 12 : login
       const query = {
         email: req.body.email,
         password: req.body.password,
@@ -416,7 +463,7 @@ mongoClient.connect(url, (err, db) => {
       });
     });
 
-    app.post("/update1", (req, res) => {
+    app.post("/update1", (req, res) => {                    // Route 13 : update , requested after we change profile data
       const query1 = {
         email: req.body.email,
       };
@@ -472,10 +519,10 @@ mongoClient.connect(url, (err, db) => {
       });
     });
 
-    app.post("/GetUserHistory", (req, res) => {
+    app.post("/GetUserHistory", (req, res) => {                          // Route 14 : GetUserHistory , returns last 4 updates of a Trainee
       const queryF = { name: req.body.name };
 
-      console.log( req.body.name );
+      console.log(req.body.name);
 
       collectionUsersHistory
         .find(queryF)
@@ -493,9 +540,14 @@ mongoClient.connect(url, (err, db) => {
           }
         });
     });
+    /////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    //This is users database
+    /////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
   }
 });
 
-app.listen(3000, () => {
+app.listen(3000, () => {                                // start the server and listen for incoming requests on port 3000
   console.log("Listining on port 3000...");
 });
